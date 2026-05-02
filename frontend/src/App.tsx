@@ -4,9 +4,11 @@ import AppLayout from './components/AppLayout'
 import ProtectedRoute from './components/ProtectedRoute'
 import HomePage from './pages/HomePage'
 import LoginPage from './pages/LoginPage'
-import OrdersPage from './pages/OrdersPage'
 import ProductFormPage from './pages/products/ProductFormPage'
 import ProductsListPage from './pages/products/ProductsListPage'
+import OrderDetailPage from './pages/orders/OrderDetailPage'
+import OrderFormPage from './pages/orders/OrderFormPage'
+import OrdersListPage from './pages/orders/OrdersListPage'
 import SupplierFormPage from './pages/suppliers/SupplierFormPage'
 import SuppliersListPage from './pages/suppliers/SuppliersListPage'
 import SuppliesListPage from './pages/supplies/SuppliesListPage'
@@ -31,7 +33,9 @@ function App() {
               <Route path="/supplies" element={<SuppliesListPage />} />
               <Route path="/supplies/new" element={<SupplyFormPage />} />
               <Route path="/supplies/:id" element={<SupplyDetailPage />} />
-              <Route path="/orders/*" element={<OrdersPage />} />
+              <Route path="/orders" element={<OrdersListPage />} />
+              <Route path="/orders/new" element={<OrderFormPage />} />
+              <Route path="/orders/:id" element={<OrderDetailPage />} />
             </Route>
           </Route>
           <Route path="*" element={<Navigate to="/" replace />} />
