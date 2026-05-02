@@ -161,3 +161,24 @@ def test_ship_requires_assembled_status(auth_admin, product):
     order = _create_order(auth_admin, product, qty=1)
     response = auth_admin.post(f'/api/orders/{order["id"]}/ship/')
     assert response.status_code == 400
+
+
+# --- Manager permissions on documents ---
+
+def test_manager_can_create_and_receive_supply(auth_manager, supplier, product):
+    supply = _create_supply(auth_manager, supplier, product, qty=4)
+    response = auth_manager.post(f'/api/supplies/{supply["id"]}/receive/')
+    assert response.status_code == 200, response.data
+    product.refresh_from_db()
+    assert product.quantity_in_stock == 4
+
+
+def test_manager_can_run_full_order_flow(auth_manager, supplier, product):
+    supply = _create_supply(auth_manager, supplier, product, qty=10)
+    auth_manager.post(f'/api/supplies/{supply["id"]}/receive/')
+    order = _create_order(auth_manager, product, qty=2)
+    auth_manager.post(f'/api/orders/{order["id"]}/assemble/')
+    response = auth_manager.post(f'/api/orders/{order["id"]}/ship/')
+    assert response.status_code == 200, response.data
+    product.refresh_from_db()
+    assert product.quantity_in_stock == 8

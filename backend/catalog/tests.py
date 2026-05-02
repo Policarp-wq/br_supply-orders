@@ -60,3 +60,40 @@ def test_supplier_inn_must_be_unique(auth_admin, supplier):
     )
     assert response.status_code == 400
     assert 'inn' in response.data
+
+
+# --- Permissions ---
+
+def test_manager_can_create_supplier(auth_manager):
+    response = auth_manager.post(
+        '/api/suppliers/',
+        {'name': 'Менеджер создал', 'inn': '7700000050'},
+        format='json',
+    )
+    assert response.status_code == 201, response.data
+
+
+def test_manager_cannot_delete_supplier(auth_manager, supplier):
+    response = auth_manager.delete(f'/api/suppliers/{supplier.pk}/')
+    assert response.status_code == 403
+
+
+def test_admin_can_delete_supplier(auth_admin, supplier):
+    response = auth_admin.delete(f'/api/suppliers/{supplier.pk}/')
+    assert response.status_code == 204
+
+
+def test_manager_cannot_delete_product(auth_manager, product):
+    response = auth_manager.delete(f'/api/products/{product.pk}/')
+    assert response.status_code == 403
+
+
+def test_manager_can_update_product(auth_manager, product):
+    response = auth_manager.patch(
+        f'/api/products/{product.pk}/',
+        {'name': 'Обновлено менеджером'},
+        format='json',
+    )
+    assert response.status_code == 200, response.data
+    product.refresh_from_db()
+    assert product.name == 'Обновлено менеджером'

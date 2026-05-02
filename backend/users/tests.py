@@ -65,3 +65,25 @@ def test_login_with_wrong_password_fails(api_client, admin_user):
         format='json',
     )
     assert response.status_code == 401
+
+
+# --- Permissions ---
+
+def test_manager_cannot_list_users(auth_manager):
+    response = auth_manager.get('/api/users/')
+    assert response.status_code == 403
+
+
+def test_manager_can_access_me(auth_manager):
+    response = auth_manager.get('/api/users/me/')
+    assert response.status_code == 200
+    assert response.data['role'] == 'manager'
+
+
+def test_manager_cannot_create_user(auth_manager):
+    response = auth_manager.post(
+        '/api/users/',
+        {'username': 'new', 'password': 'pwd', 'role': 'manager'},
+        format='json',
+    )
+    assert response.status_code == 403
