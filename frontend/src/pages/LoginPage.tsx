@@ -4,7 +4,6 @@ import {
   Button,
   Card,
   CardContent,
-  Stack,
   TextField,
   Typography,
 } from '@mui/material'
@@ -67,36 +66,38 @@ export default function LoginPage() {
           <Typography color="text.secondary" sx={{ mb: 3 }}>
             Войдите, чтобы продолжить.
           </Typography>
-          <Box component="form" onSubmit={handleSubmit}>
-            <Stack spacing={2}>
-              <TextField
-                label="Логин"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                autoFocus
-                required
-                fullWidth
-                disabled={submitting}
-              />
-              <TextField
-                label="Пароль"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                fullWidth
-                disabled={submitting}
-              />
-              {error && <Alert severity="error">{error}</Alert>}
-              <Button
-                type="submit"
-                variant="contained"
-                size="large"
-                disabled={submitting}
-              >
-                {submitting ? 'Вход…' : 'Войти'}
-              </Button>
-            </Stack>
+          <Box
+            component="form"
+            onSubmit={handleSubmit}
+            sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}
+          >
+            <TextField
+              label="Логин"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              autoFocus
+              required
+              fullWidth
+              disabled={submitting}
+            />
+            <TextField
+              label="Пароль"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              fullWidth
+              disabled={submitting}
+            />
+            {error && <Alert severity="error">{error}</Alert>}
+            <Button
+              type="submit"
+              variant="contained"
+              size="large"
+              disabled={submitting}
+            >
+              {submitting ? 'Вход…' : 'Войти'}
+            </Button>
           </Box>
         </CardContent>
       </Card>

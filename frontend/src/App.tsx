@@ -6,8 +6,9 @@ import HomePage from './pages/HomePage'
 import LoginPage from './pages/LoginPage'
 import OrdersPage from './pages/OrdersPage'
 import ProductsPage from './pages/ProductsPage'
-import SuppliersPage from './pages/SuppliersPage'
 import SuppliesPage from './pages/SuppliesPage'
+import SupplierFormPage from './pages/suppliers/SupplierFormPage'
+import SuppliersListPage from './pages/suppliers/SuppliersListPage'
 
 function App() {
   return (
@@ -18,7 +19,9 @@ function App() {
           <Route element={<ProtectedRoute />}>
             <Route element={<AppLayout />}>
               <Route path="/" element={<HomePage />} />
-              <Route path="/suppliers/*" element={<SuppliersPage />} />
+              <Route path="/suppliers" element={<SuppliersListPage />} />
+              <Route path="/suppliers/new" element={<SupplierFormPage />} />
+              <Route path="/suppliers/:id/edit" element={<SupplierFormPage />} />
               <Route path="/products/*" element={<ProductsPage />} />
               <Route path="/supplies/*" element={<SuppliesPage />} />
               <Route path="/orders/*" element={<OrdersPage />} />
