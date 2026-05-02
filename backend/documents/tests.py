@@ -73,3 +73,91 @@ def test_supply_list_returns_existing(auth_admin, supplier, product):
     response = auth_admin.get('/api/supplies/')
     assert response.status_code == 200
     assert response.data['count'] == 1
+
+
+# --- Status transitions ---
+
+def _create_supply(client, supplier, product, qty=10):
+    response = client.post(
+        '/api/supplies/',
+        {
+            'supplier': supplier.pk,
+            'items': [{'product': product.pk, 'quantity': qty, 'unit_price': '100.00'}],
+        },
+        format='json',
+    )
+    assert response.status_code == 201, response.data
+    return response.data
+
+
+def _create_order(client, product, qty=3):
+    response = client.post(
+        '/api/orders/',
+        {
+            'customer_name': 'ИП Клиент',
+            'items': [{'product': product.pk, 'quantity': qty, 'unit_price': '120.00'}],
+        },
+        format='json',
+    )
+    assert response.status_code == 201, response.data
+    return response.data
+
+
+def test_receive_supply_increments_stock(auth_admin, supplier, product):
+    supply = _create_supply(auth_admin, supplier, product, qty=15)
+    assert product.quantity_in_stock == 0
+
+    response = auth_admin.post(f'/api/supplies/{supply["id"]}/receive/')
+    assert response.status_code == 200, response.data
+    assert response.data['status'] == SupplyStatus.RECEIVED
+    assert response.data['received_at'] is not None
+
+    product.refresh_from_db()
+    assert product.quantity_in_stock == 15
+
+
+def test_receive_supply_blocks_double_receive(auth_admin, supplier, product):
+    supply = _create_supply(auth_admin, supplier, product)
+    auth_admin.post(f'/api/supplies/{supply["id"]}/receive/')
+    response = auth_admin.post(f'/api/supplies/{supply["id"]}/receive/')
+    assert response.status_code == 400
+
+
+def test_assemble_order_changes_status(auth_admin, product):
+    order = _create_order(auth_admin, product)
+    response = auth_admin.post(f'/api/orders/{order["id"]}/assemble/')
+    assert response.status_code == 200, response.data
+    assert response.data['status'] == OrderStatus.ASSEMBLED
+
+
+def test_ship_order_decrements_stock(auth_admin, supplier, product):
+    supply = _create_supply(auth_admin, supplier, product, qty=10)
+    auth_admin.post(f'/api/supplies/{supply["id"]}/receive/')
+    product.refresh_from_db()
+    assert product.quantity_in_stock == 10
+
+    order = _create_order(auth_admin, product, qty=3)
+    auth_admin.post(f'/api/orders/{order["id"]}/assemble/')
+    response = auth_admin.post(f'/api/orders/{order["id"]}/ship/')
+    assert response.status_code == 200, response.data
+    assert response.data['status'] == OrderStatus.SHIPPED
+    assert response.data['shipped_at'] is not None
+
+    product.refresh_from_db()
+    assert product.quantity_in_stock == 7
+
+
+def test_ship_order_fails_when_insufficient_stock(auth_admin, product):
+    order = _create_order(auth_admin, product, qty=99)
+    auth_admin.post(f'/api/orders/{order["id"]}/assemble/')
+    response = auth_admin.post(f'/api/orders/{order["id"]}/ship/')
+    assert response.status_code == 400
+    assert 'detail' in response.data
+    product.refresh_from_db()
+    assert product.quantity_in_stock == 0
+
+
+def test_ship_requires_assembled_status(auth_admin, product):
+    order = _create_order(auth_admin, product, qty=1)
+    response = auth_admin.post(f'/api/orders/{order["id"]}/ship/')
+    assert response.status_code == 400
