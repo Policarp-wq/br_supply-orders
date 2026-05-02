@@ -5,8 +5,9 @@ import ProtectedRoute from './components/ProtectedRoute'
 import HomePage from './pages/HomePage'
 import LoginPage from './pages/LoginPage'
 import OrdersPage from './pages/OrdersPage'
-import ProductsPage from './pages/ProductsPage'
 import SuppliesPage from './pages/SuppliesPage'
+import ProductFormPage from './pages/products/ProductFormPage'
+import ProductsListPage from './pages/products/ProductsListPage'
 import SupplierFormPage from './pages/suppliers/SupplierFormPage'
 import SuppliersListPage from './pages/suppliers/SuppliersListPage'
 
@@ -22,7 +23,9 @@ function App() {
               <Route path="/suppliers" element={<SuppliersListPage />} />
               <Route path="/suppliers/new" element={<SupplierFormPage />} />
               <Route path="/suppliers/:id/edit" element={<SupplierFormPage />} />
-              <Route path="/products/*" element={<ProductsPage />} />
+              <Route path="/products" element={<ProductsListPage />} />
+              <Route path="/products/new" element={<ProductFormPage />} />
+              <Route path="/products/:id/edit" element={<ProductFormPage />} />
               <Route path="/supplies/*" element={<SuppliesPage />} />
               <Route path="/orders/*" element={<OrdersPage />} />
             </Route>
