@@ -1,5 +1,6 @@
 import pytest
 
+from users.models import User
 
 pytestmark = pytest.mark.django_db
 
@@ -87,3 +88,29 @@ def test_manager_cannot_create_user(auth_manager):
         format='json',
     )
     assert response.status_code == 403
+
+
+# --- seed_demo management command ---
+
+def test_seed_demo_populates_db(db):
+    from django.core.management import call_command
+    from catalog.models import Product, Supplier
+    from documents.models import Order, Supply
+
+    call_command('seed_demo', verbosity=0)
+    assert User.objects.filter(username='admin').exists()
+    assert User.objects.filter(username='manager').exists()
+    assert Supplier.objects.count() == 3
+    assert Product.objects.count() == 10
+    assert Supply.objects.count() == 2
+    assert Order.objects.count() == 2
+
+
+def test_seed_demo_is_idempotent(db):
+    from django.core.management import call_command
+    from catalog.models import Product, Supplier
+
+    call_command('seed_demo', verbosity=0)
+    call_command('seed_demo', verbosity=0)
+    assert Supplier.objects.count() == 3
+    assert Product.objects.count() == 10
