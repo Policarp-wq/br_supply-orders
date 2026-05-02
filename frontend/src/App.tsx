@@ -5,11 +5,13 @@ import ProtectedRoute from './components/ProtectedRoute'
 import HomePage from './pages/HomePage'
 import LoginPage from './pages/LoginPage'
 import OrdersPage from './pages/OrdersPage'
-import SuppliesPage from './pages/SuppliesPage'
 import ProductFormPage from './pages/products/ProductFormPage'
 import ProductsListPage from './pages/products/ProductsListPage'
 import SupplierFormPage from './pages/suppliers/SupplierFormPage'
 import SuppliersListPage from './pages/suppliers/SuppliersListPage'
+import SuppliesListPage from './pages/supplies/SuppliesListPage'
+import SupplyDetailPage from './pages/supplies/SupplyDetailPage'
+import SupplyFormPage from './pages/supplies/SupplyFormPage'
 
 function App() {
   return (
@@ -26,7 +28,9 @@ function App() {
               <Route path="/products" element={<ProductsListPage />} />
               <Route path="/products/new" element={<ProductFormPage />} />
               <Route path="/products/:id/edit" element={<ProductFormPage />} />
-              <Route path="/supplies/*" element={<SuppliesPage />} />
+              <Route path="/supplies" element={<SuppliesListPage />} />
+              <Route path="/supplies/new" element={<SupplyFormPage />} />
+              <Route path="/supplies/:id" element={<SupplyDetailPage />} />
               <Route path="/orders/*" element={<OrdersPage />} />
             </Route>
           </Route>
