@@ -10,7 +10,7 @@ describe('App routing', () => {
 
   it('redirects unauthenticated user to /login', () => {
     render(<App />)
-    expect(screen.getByText('Вход')).toBeInTheDocument()
+    expect(screen.getByText(/войдите, чтобы продолжить/i)).toBeInTheDocument()
     expect(window.location.pathname).toBe('/login')
   })
 
