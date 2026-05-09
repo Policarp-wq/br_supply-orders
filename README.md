@@ -37,9 +37,37 @@
 
 ## Структура репозитория
 
-- `backend/` — Django-проект (будет инициализирован на этапе 1).
-- `frontend/` — React-приложение (будет инициализировано на этапе 1).
-- `docker-compose.yml` — локальный запуск PostgreSQL и сервисов (этап 1).
+- `backend/` — Django-проект.
+- `frontend/` — React-приложение.
+- `docker-compose.yml` — продакшен-запуск из образов на Docker Hub.
+- `docker-compose.dev.yml` — локальный запуск со сборкой из исходников.
+
+## Запуск
+
+### Локально из исходников
+
+```bash
+docker compose -f docker-compose.dev.yml up -d --build
+docker compose -f docker-compose.dev.yml exec backend python manage.py seed_demo
+```
+
+Открыть http://localhost/, логин `admin` / `admin`.
+
+### На VPS из образов Docker Hub
+
+CI публикует образы `<DOCKER_USERNAME>/br_supply_orders_backend` и `<DOCKER_USERNAME>/br_supply_orders_frontend` на каждый push. Для запуска нужны Docker, docker compose и открытый порт 80.
+
+```bash
+git clone https://github.com/Policarp-wq/br_supply-orders.git
+cd br_supply-orders
+cp .env.example .env
+# отредактировать .env: указать DOCKER_USERNAME и сменить DJANGO_SECRET_KEY
+docker compose pull
+docker compose up -d
+docker compose exec backend python manage.py seed_demo
+```
+
+Открыть http://<ip-vps>/.
 
 ## План реализации
 
