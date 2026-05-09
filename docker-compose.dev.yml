@@ -6,7 +6,9 @@ services:
     environment:
       POSTGRES_DB: supply_orders
       POSTGRES_USER: supply_orders
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-supply_orders}
+      POSTGRES_PASSWORD: supply_orders
+    ports:
+      - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
@@ -16,28 +18,29 @@ services:
       retries: 10
 
   backend:
-    image: ${DOCKER_USERNAME}/br_supply_orders_backend:${IMAGE_TAG:-latest}
+    build: ./backend
     container_name: supply-orders-backend
     restart: unless-stopped
-    pull_policy: always
     environment:
-      DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY:-change-me-in-production}
-      DJANGO_DEBUG: ${DJANGO_DEBUG:-False}
-      DJANGO_ALLOWED_HOSTS: ${DJANGO_ALLOWED_HOSTS:-*}
+      DJANGO_SECRET_KEY: dev-insecure-change-me-in-production
+      DJANGO_DEBUG: "True"
+      DJANGO_ALLOWED_HOSTS: "*"
       POSTGRES_DB: supply_orders
       POSTGRES_USER: supply_orders
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-supply_orders}
+      POSTGRES_PASSWORD: supply_orders
       POSTGRES_HOST: postgres
       POSTGRES_PORT: "5432"
+      CORS_ALLOWED_ORIGINS: http://localhost:5173,http://127.0.0.1:5173
+    ports:
+      - "8000:8000"
     depends_on:
       postgres:
         condition: service_healthy
 
   frontend:
-    image: ${DOCKER_USERNAME}/br_supply_orders_frontend:${IMAGE_TAG:-latest}
+    build: ./frontend
     container_name: supply-orders-frontend
     restart: unless-stopped
-    pull_policy: always
     ports:
       - "80:80"
     depends_on:
